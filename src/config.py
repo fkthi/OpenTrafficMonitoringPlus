@@ -66,6 +66,8 @@ default_config = Config({
     "weights_path": "maskrcnn/model_final.pth",
     # Detectron2 config used for inference. (Has nothing to do with this config)
     "detectron2_config": "./maskrcnn/mask_rcnn_R_50_FPN_1x.yaml",
+    # Number of classes in the model
+    "num_classes": 1,
     # Save predicted Images from MASKRCNN in 'temp/images_after_network'
     # -> reduces performance but good for quality evaluation
     "save_predicted": False,

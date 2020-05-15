@@ -62,7 +62,7 @@ def run_inference(temp_folder, opentraffic_config):
     cfg.INPUT.MAX_SIZE_TEST = 1920
     cfg.INPUT.MIN_SIZE_TEST = 0
     cfg.TEST.DETECTIONS_PER_IMAGE = opentraffic_config.detections_per_image
-    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
+    cfg.MODEL.ROI_HEADS.NUM_CLASSES = opentraffic_config.num_classes
     cfg.MODEL.WEIGHTS = opentraffic_config.weights_path
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = opentraffic_config.score_threshold
 
