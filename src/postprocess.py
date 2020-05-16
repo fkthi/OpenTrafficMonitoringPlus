@@ -877,10 +877,8 @@ def process_finished_track(track):
     yaw, yaw_in_img, veh_length, veh_width, car_cornerskf_tracker, \
     car_corners_tracker, corresponding_frame = ([0 for _ in range(track_length)] for _ in range(16))
 
+
     for idx in range(track_length):
-        # Delete entries at the beginning
-        if idx < cfg.delete_n_first_entries and global_step > cfg.delete_n_first_entries:
-            continue
 
         his_x = kf_obj.history_X[idx]
         his_e = kf_obj.history_E[idx]
@@ -902,29 +900,32 @@ def process_finished_track(track):
         car_corners_tracker[idx] = (kf_obj.history_car_corners[idx])
         corresponding_frame[idx] = (kf_obj.history_corresponding_frame[idx])
 
-    # Check if Track is plausible
-    if cfg.discard_slow_tracks:
-        if len(speed) == 0:
-            # happens when min_hits <= delete_n_first_entries (Track is useless anyway)
-            return
+    # Drop entries that have not fully entered the frame
+    avg_veh_length = ((sum(veh_length) / len(veh_length)) / 100) * cfg.fully_entered_threshold
+
+    idx_to_drop = []
+    for idx in range(track_length):
+        if not veh_length[idx] > avg_veh_length:
+            idx_to_drop.append(idx) 
+
         avg_speed = sum(speed) / len(speed)
         if avg_speed <= cfg.standstill:
             # Discard track if the average speed is below the standstill threshold
             return
-
+    # Dropping indices  
     final_tracks[final_trk_id] = {
-        "acc_x_ltp": acc_x_ltp,
-        "acc_y_ltp": acc_y_ltp,
-        "carCorners_tracker": car_corners_tracker,
-        "carCornersKF_tracker": car_cornerskf_tracker,
-        "posX": pos_x,
-        "posY": pos_y,
-        "speed": speed,
-        "veh_length": veh_length,
-        "veh_width": veh_width,
-        "yaw": yaw,
-        "yawInImg": yaw_in_img,
-        "corresponding_frame": corresponding_frame
+        "acc_x_ltp": [el for i, el in enumerate(acc_x_ltp) if i not in idx_to_drop],
+        "acc_y_ltp": [el for i, el in enumerate(acc_y_ltp) if i not in idx_to_drop],
+        "carCorners_tracker": [el for i, el in enumerate(car_corners_tracker) if i not in idx_to_drop],
+        "carCornersKF_tracker": [el for i, el in enumerate(car_cornerskf_tracker) if i not in idx_to_drop],
+        "posX": [el for i, el in enumerate(pos_x) if i not in idx_to_drop],
+        "posY": [el for i, el in enumerate(pos_y) if i not in idx_to_drop],
+        "speed": [el for i, el in enumerate(speed) if i not in idx_to_drop],
+        "veh_length": [el for i, el in enumerate(veh_length) if i not in idx_to_drop],
+        "veh_width": [el for i, el in enumerate(veh_width) if i not in idx_to_drop],
+        "yaw": [el for i, el in enumerate(yaw) if i not in idx_to_drop],
+        "yawInImg": [el for i, el in enumerate(yaw_in_img) if i not in idx_to_drop],
+        "corresponding_frame": [el for i, el in enumerate(corresponding_frame) if i not in idx_to_drop]
     }
 
     globals()['final_trk_id'] += 1
@@ -1027,6 +1028,11 @@ def final_clean_up(save_dir, visualize):
     # resetting global track variables -> necessary if there's more than one video
     globals()["final_tracks"].clear()
     globals()["final_trk_id"] = 0
+
+    # Deleting the preprocessed_images folder, if 'del_temp_images' set to True
+    if cfg.del_temp_images:
+        im_path = (save_dir + "/preprocessed_images/")
+        [os.remove(im_path + file) for file in os.listdir(im_path)]
 
 
 def postprocess(temp_dir, config):

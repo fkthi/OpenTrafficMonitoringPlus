@@ -79,11 +79,12 @@ default_config = Config({
     # If the speed of a vehicle is less than 'standstill'
     # it's considered to be not moving (in m/s)
     "standstill": 0.5,
+    # The threshold value for which a vehicle is considered to have
+    # "fully" entered the frame (vehicle length in %)
+    # Only after the vehicle has "fully" entered the Frame it gets tracked
+    "fully_entered_threshold": 80,
     # If the average speed of a track / object is less than 'standstill' the track gets discarded
     "discard_slow_tracks": False,
-    # Deletes n frames at the beginning to account for the time the
-    # vehicle needs to fully enter the frame (-1 to disable)
-    "delete_n_first_entries": 25,
     # If the track is lost for n consecutive frames, it is considered to be lost
     "invisible_for_too_long": 5,
     # Hungarian algorithm cost of non assignment
@@ -120,12 +121,16 @@ default_config = Config({
     "save_as_json": True,
     "save_as_pickle": True,
     "save_as_txt": True,
+    # Whether to delete the temporal images after the video is finished
+    "del_temp_images": True,
 
     # <-------- VISUALIZATION  -------->
 
     # Create track visualization video after postprocessing
     "visualize": True,
+    # Draw detected car corners in the visualization video
     "draw_corners": True,
+    # Draw kalman car corners in the visualization video
     "draw_kf_corners": False,
     # Which metric to use for the visualization video.
     # For a list of the supported metrics go to visualize_tracks.py
