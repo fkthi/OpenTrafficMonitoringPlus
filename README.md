@@ -82,9 +82,7 @@ You can also provide images instead of videos:
 python main.py --images=./images/:./out/ --config=default
 # '--config' argument refers to the 'config_name', not video_name !
 ```
-Note, that the provided images are sorted alphabetically, so depending on your images names you have to implement 
-your own sorting logic (numerical for example). You also have to specify a config, since it cannot be inferred by the video name.
-
+Note that a config must be specified when using images, since the config cannot be inferred by the video name.
 # Example data and training weights
 One example video is already included in this repository ([DJI_0029_example.mp4](src/videos/)).
 For further data, i.e. pre-trained weights, the labeled data of the test vehicle or one complete video from the paper data set,

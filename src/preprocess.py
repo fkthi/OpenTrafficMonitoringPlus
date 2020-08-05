@@ -63,8 +63,26 @@ def register_images(temp_dir, temp_folder_raw, temp_folder_reg, ref_img, cfg):
 
     [os.remove(temp_folder_raw + file) for file in os.listdir(temp_folder_raw)]
 
+def sort_image_names(img_names):
+    # Check if image names are just numbers
+    if all([img.split(".")[0].isnumeric() for img in img_names]):
+        print("Sorting Images numerically")
+        return sorted(img_names, key= lambda x : int(x.split(".")[0]))
+
+    # Check if in Format video_xxx_001, video_xxx_002, ...
+    if all(["_" in img for img in img_names]) and all([img.split(".")[0].split("_")[-1].isnumeric()
+                                                       for img in img_names]):
+
+        print("Sorting Images by number after last underscore")
+        return sorted(img_names, key=lambda x : int(x.split(".")[0].split("_")[-1]))
+    # Default
+    print("WARNING: No Image naming pattern detected. Defaulting to alphabetic order")
+    return sorted(img_names)
+
 
 def preprocess_images(image_folder, temp_folder, cfg):
+    assert len([el for el in os.listdir(image_folder) if el.endswith(".jpg")]) > 0, "No .jpg files found in Folder: " \
+                                                                                    + image_folder
     if cfg.register_images:
         raw_img_folder = os.path.join(temp_folder, "raw_images/")
         reg_img_folder = os.path.join(temp_folder, "preprocessed_images/")
@@ -76,8 +94,7 @@ def preprocess_images(image_folder, temp_folder, cfg):
         for image in os.listdir(image_folder):
             shutil.copyfile(os.path.join(image_folder, image), os.path.join(raw_img_folder, image))
 
-        sorted_img_list = sorted(os.listdir(raw_img_folder))
-
+        sorted_img_list = sort_image_names(os.listdir(raw_img_folder))
         for i, img in enumerate(sorted_img_list):
             os.rename(os.path.join(raw_img_folder, img), os.path.join(raw_img_folder, str(i) + ".jpg"))
 
@@ -94,8 +111,7 @@ def preprocess_images(image_folder, temp_folder, cfg):
 
         for image in os.listdir(image_folder):
             shutil.copyfile(os.path.join(image_folder, image), os.path.join(reg_img_folder, image))
-        sorted_img_list = sorted(os.listdir(reg_img_folder))
-
+        sorted_img_list = sort_image_names(os.listdir(reg_img_folder))
         for i, img in enumerate(sorted_img_list):
             os.rename(os.path.join(reg_img_folder, img), os.path.join(reg_img_folder, str(i) + ".jpg"))
         ref_img = cv2.imread(image_folder + sorted_img_list[0])

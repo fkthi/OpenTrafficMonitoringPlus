@@ -10,6 +10,7 @@ warnings.simplefilter("ignore", FutureWarning)
 warnings.simplefilter("ignore", RuntimeWarning)
 
 from sklearn.utils.linear_assignment_ import linear_assignment
+# from scipy.optimize import linear_sum_assignment
 from tqdm import trange
 import numpy as np
 from shapely.geometry import Polygon
@@ -732,11 +733,9 @@ def detection_to_track_assignment(cost_of_non_assignment, n_veh):
     Compute the cost of assigning each detection to each track
     """
     dets = []
-
     for i in range(n_veh):
         if len(_boxes_rot[global_step]) >= 1:  # -> drone saw a vehicle
             car_corners = np.array([_boxes_rot[global_step][i][x] for x in range(4)])
-
         else:  # -> drone saw no vehicle
             print("no vehicle")
             car_corners = np.zeros((4, 2))
@@ -930,31 +929,28 @@ def process_finished_track(track):
 
     globals()['final_trk_id'] += 1
 
+def makedir_or_remove(path):
+    if not os.path.exists(path):
+        os.makedirs(path, exist_ok=True)
+    else:
+        if len(os.listdir(path)) != 0:
+            for element in os.listdir(path):
+                os.remove(path + element)
 
 def save_tracks_csv(tracks, save_path):
-    if not os.path.exists(save_path):
-        os.makedirs(save_path, exist_ok=True)
-    else:
-        if len(os.listdir(save_path)) != 0:
-            for element in os.listdir(save_path):
-                os.remove(save_path + element)
+    makedir_or_remove(save_path)
 
-    for key, value in tracks.items():
-        with open(str(Path(save_path) / "track_") + str(key) + ".csv", 'w', newline="") as csv_file:
+    for key, subdict in tracks.items():
+        with open(str(Path(save_path) / "track_") + str(key) + ".csv",'w', newline="") as csv_file:
             writer = csv.writer(csv_file)
-            for key2, value2 in value.items():
-                writer.writerow([key2, value2])
+            writer.writerow(subdict.keys())
+            writer.writerows(zip(*[subdict[key] for key in subdict.keys()]))
 
 
 def save_tracks_json(tracks, save_path):
     import json
 
-    if not os.path.exists(save_path):
-        os.makedirs(save_path, exist_ok=True)
-    else:
-        if len(os.listdir(save_path)) != 0:
-            for element in os.listdir(save_path):
-                os.remove(save_path + element)
+    makedir_or_remove(save_path)
 
     for key, value in tracks.items():
         with open(str(Path(save_path) / "track_") + str(key) + ".json", "w") as json_file:
@@ -965,12 +961,7 @@ def save_tracks_json(tracks, save_path):
 def save_tracks_pickle(tracks, save_path):
     import pickle
 
-    if not os.path.exists(save_path):
-        os.makedirs(save_path, exist_ok=True)
-    else:
-        if len(os.listdir(save_path)) != 0:
-            for element in os.listdir(save_path):
-                os.remove(save_path + element)
+    makedir_or_remove(save_path)
 
     for key, value in tracks.items():
         with open(str(Path(save_path) / "track_") + str(key) + ".pkl", "wb") as pickle_file:
@@ -978,12 +969,7 @@ def save_tracks_pickle(tracks, save_path):
 
 
 def save_tracks_txt(tracks, save_path):
-    if not os.path.exists(save_path):
-        os.makedirs(save_path, exist_ok=True)
-    else:
-        if len(os.listdir(save_path)) != 0:
-            for element in os.listdir(save_path):
-                os.remove(save_path + element)
+    makedir_or_remove(save_path)
 
     for key, value in tracks.items():
         with open(str(Path(save_path) / "track_") + str(key) + ".txt", "w") as txt_file:
@@ -993,8 +979,8 @@ def save_tracks_txt(tracks, save_path):
 def final_clean_up(save_dir, visualize):
     """
     Final Cleanup after the last iteration
-        Saves all the remaining tracks with a valid min_hits amount
-        Writes the final tracks to disk
+    Saves all the remaining tracks with a valid min_hits amount
+    Writes the final tracks to disk
     """
 
     [process_finished_track(trk) for trk in tracks.get_tracks()
