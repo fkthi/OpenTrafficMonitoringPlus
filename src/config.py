@@ -136,7 +136,7 @@ default_config = Config({
     # For a list of the supported metrics go to visualize_tracks.py
     "vis_metric": "speed",
     # Compress Video with ffmpeg (requires ffmpeg to be installed)
-    "compress_video": True
+    "compress_video": False
 })
 
 example_new_config = default_config.copy({
