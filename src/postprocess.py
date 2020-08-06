@@ -210,7 +210,7 @@ def vehicle_resize_polygon(car_corners, picture_centroids, drone_height, meter_t
         dist_to_center[i, 12] = dist_to_center[i, 10] + picture_centroids[1, 1]
 
     dist_to_center = np.array(sorted(dist_to_center, key=itemgetter(3)))
-    car_corners[0:4, 0:2] = dist_to_center[0:4, 12:14]
+    car_corners[0:4, 0:2] = dist_to_center[0:4, 11:14]
     return car_corners
 
 
