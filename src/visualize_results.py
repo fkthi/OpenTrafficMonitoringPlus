@@ -45,9 +45,19 @@ def unit_mapping(val, meter_to_px):
 
     return retval if meter_to_px != 1 else retval.replace("km/h", "px/s")
 
+def compress_video(video_path, abs_path, video_name):
+    """Executes ffmpeg shell command to compress the output video"""
+    print("Compressing video...")
+    save_path = Path(abs_path).parents[0]
+    save_path = str(save_path) + "/"+video_name +"_compressed.mp4"
+    os.system("ffmpeg -i {} -vcodec libx265 -crf 28 {} -loglevel quiet -y".format(video_path, save_path))
+    # Remove uncompressed Video
+    os.remove(video_path)
 
 def visualize_tracks(path, all_tracks, cfg):
     from postprocess import back_to_normal
+    n_frames_smoothing = 20
+    assert n_frames_smoothing % 2 ==0 ,"smoothing factor must be even"
 
     supported_metrics = [
         "speed", "yaw", "yawInImg", "posX", "posY", "veh_length", "veh_width",
@@ -96,7 +106,13 @@ def visualize_tracks(path, all_tracks, cfg):
                 cv2.drawContours(frame, [corresponding_bb_kf], 0, (0, 0, 0), 2)
 
             try:
-                corresponding_metric = trk[cfg.vis_metric][roundup(idx_pos_of_bb, cfg.fps)]
+                roundup_idx = roundup(idx_pos_of_bb, cfg.fps)
+                # Select range
+                corresponding_metric = sum(
+                    trk[cfg.vis_metric][roundup_idx - (n_frames_smoothing // 2):roundup_idx
+                    +(n_frames_smoothing // 2)]) / n_frames_smoothing
+
+
             except:
                 corresponding_metric = trk[cfg.vis_metric][-1]
 
@@ -120,4 +136,8 @@ def visualize_tracks(path, all_tracks, cfg):
 
         writer.write(frame)
     writer.release()
+    if cfg.compress_video:
+        compress_video(save_path, abs_path, video_name)
+        filename = filename.replace(".mp4","") + "_compressed.mp4"
+        save_path = str(save_path).replace(".mp4","") + "_compressed.mp4"
     print("\ncreated video '{}' in '{}'".format(filename, save_path))
