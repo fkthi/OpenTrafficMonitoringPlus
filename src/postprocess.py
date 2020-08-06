@@ -6,11 +6,9 @@ import math
 from operator import itemgetter
 from pathlib import Path
 
-warnings.simplefilter("ignore", FutureWarning)
 warnings.simplefilter("ignore", RuntimeWarning)
 
-from sklearn.utils.linear_assignment_ import linear_assignment
-# from scipy.optimize import linear_sum_assignment
+from scipy.optimize import linear_sum_assignment
 from tqdm import trange
 import numpy as np
 from shapely.geometry import Polygon
@@ -703,7 +701,8 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.5):
             det = np.array(det).flatten()
 
             iou_matrix[d_idx, t_idx] = iou(det, trk)
-    matched_indices = linear_assignment(-iou_matrix)
+
+    matched_indices = np.asarray(linear_sum_assignment(-iou_matrix)).T
     unmatched_detections = []
     for d_idx, det in enumerate(detections):
         if (d_idx not in matched_indices[:, 0]):
