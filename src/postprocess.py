@@ -871,7 +871,7 @@ def process_finished_track(track):
     kf_obj = track[TrackEnum.KALMANFILTER]
     track_length = len(kf_obj.history_E)
 
-    pos_x, pos_y, vel_x_gtp, vel_y_gtp, speed, acc_x_ltp, acc_y_ltp, acc_magn, course_og, \
+    pos_x, pos_y, vel_x_gtp, vel_y_gtp, speed, vel_x_ltp, vel_y_ltp, acc_magn, course_og, \
     yaw, yaw_in_img, veh_length, veh_width, car_cornerskf_tracker, \
     car_corners_tracker, corresponding_frame = ([0 for _ in range(track_length)] for _ in range(16))
 
@@ -888,8 +888,8 @@ def process_finished_track(track):
         speed[idx] = (math.sqrt(his_x[2] ** 2 + his_x[3] ** 2))
         yaw[idx] = (his_x[6])
         yaw_in_img[idx] = (his_x[6] - cfg.orientation_offset)
-        acc_x_ltp[idx] = (his_e[4])
-        acc_y_ltp[idx] = (his_e[5])
+        vel_x_ltp[idx] = (his_e[4])
+        vel_y_ltp[idx] = (his_e[5])
         acc_magn[idx] = ((his_e[4] ** 2 + (his_e[5]) ** 2) ** (1 / 2))
         course_og[idx] = (his_e[2])
         veh_length[idx] = (kf_obj.history_car_length[idx])
@@ -912,13 +912,14 @@ def process_finished_track(track):
             return
     # Dropping indices  
     final_tracks[final_trk_id] = {
-        "acc_x_ltp": [el for i, el in enumerate(acc_x_ltp) if i not in idx_to_drop],
-        "acc_y_ltp": [el for i, el in enumerate(acc_y_ltp) if i not in idx_to_drop],
+        "vel_x": [el for i, el in enumerate(vel_x_ltp) if i not in idx_to_drop],
+        "vel_y": [el for i, el in enumerate(vel_y_ltp) if i not in idx_to_drop],
         "carCorners_tracker": [el for i, el in enumerate(car_corners_tracker) if i not in idx_to_drop],
         "carCornersKF_tracker": [el for i, el in enumerate(car_cornerskf_tracker) if i not in idx_to_drop],
         "posX": [el for i, el in enumerate(pos_x) if i not in idx_to_drop],
         "posY": [el for i, el in enumerate(pos_y) if i not in idx_to_drop],
         "speed": [el for i, el in enumerate(speed) if i not in idx_to_drop],
+        "acc" : [el for i, el in enumerate(acc_magn) if i not in idx_to_drop],
         "veh_length": [el for i, el in enumerate(veh_length) if i not in idx_to_drop],
         "veh_width": [el for i, el in enumerate(veh_width) if i not in idx_to_drop],
         "yaw": [el for i, el in enumerate(yaw) if i not in idx_to_drop],
@@ -985,6 +986,13 @@ def final_clean_up(save_dir, visualize):
     [process_finished_track(trk) for trk in tracks.get_tracks()
      if trk[TrackEnum.CONSECINVISCNT] <= cfg.invisible_for_too_long
      and trk[TrackEnum.TOTALVISIBLECNT] >= cfg.min_hits]
+
+    # Sort tracks based on frame
+    all_tracks = [track for track in globals()["final_tracks"].items()]
+    all_tracks = sorted(all_tracks, key=lambda x : x[1]["corresponding_frame"][0])
+    final_tracks = {}
+    for i,sorted_track in enumerate(all_tracks):
+        final_tracks[i] = sorted_track[1]
 
     save_dir = os.path.abspath(save_dir)
 
