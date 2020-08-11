@@ -25,7 +25,7 @@ def get_color_mapping(id):
 
 
 def roundup(x, fps):
-    fps //= 2
+    fps //= 4
     return int(math.ceil(x / float(fps))) * fps
 
 
@@ -58,6 +58,7 @@ def visualize_tracks(path, all_tracks, cfg):
     from postprocess import back_to_normal
     n_frames_smoothing = 20
     assert n_frames_smoothing % 2 ==0 ,"smoothing factor must be even"
+    assert cfg.vis_mode in ["normal", "debug"], "Invalid Argument for Visualization mode"
 
     supported_metrics = [
         "speed", "yaw", "yawInImg", "posX", "posY", "veh_length", "veh_width",
@@ -124,15 +125,27 @@ def visualize_tracks(path, all_tracks, cfg):
                 cv2.drawContours(frame, [corresponding_bb], 0, get_color_mapping(track_id), 4)
             x, y, w, h = cv2.boundingRect(corresponding_bb)
 
-            text_metric = "{:4.1f}{} ID:{:2} ".format(corresponding_metric,
+            text_metric = "{:4.1f}{} ID: {:2} ".format(corresponding_metric,
                                                       unit_mapping(cfg.vis_metric, cfg.meter_to_px), str(track_id))
 
-            (text_width, text_height), baseline = cv2.getTextSize(text_metric, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
+            if cfg.vis_mode == "debug":
+                font_size = 0.5
+                line_type = 1
+                box_margin = 3
+                centroid = (np.sum(corresponding_bb[:,0]) // 4) - 25 , (np.sum(corresponding_bb[:,1]) // 4) + 25
+                cv2.putText(frame, str(track_id), centroid, cv2.FONT_HERSHEY_SIMPLEX,1.4, (225, 0, 255), 3)
 
-            cv2.rectangle(frame, (x, y), (x + text_width, y - text_height - baseline - 10), get_color_mapping(track_id),
+            elif cfg.vis_mode == "normal":
+                font_size = 0.6
+                line_type = 2
+                box_margin = 10
+
+
+            (text_width, text_height), baseline = cv2.getTextSize(text_metric, cv2.FONT_HERSHEY_SIMPLEX, font_size, line_type)
+            cv2.rectangle(frame, (x, y), (x + text_width, y - text_height - baseline - box_margin), get_color_mapping(track_id),
                           cv2.FILLED)
             cv2.putText(frame, text_metric, (x, y - 5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                        cv2.FONT_HERSHEY_SIMPLEX, font_size, (255, 255, 255), line_type)
 
         writer.write(frame)
     writer.release()
