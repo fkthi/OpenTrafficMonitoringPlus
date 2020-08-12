@@ -872,7 +872,7 @@ def process_finished_track(track):
 
     pos_x, pos_y, speed, vel_x_ltp, vel_y_ltp, acc_magn, acc_x_ltp, acc_y_ltp, acc_x_lcp, acc_y_lcp, \
     yaw, yaw_in_img, course_og, sideslip, veh_length, veh_width, car_cornerskf_tracker, \
-    car_corners_tracker, corresponding_frame = ([0 for _ in range(track_length)] for _ in range(16))
+    car_corners_tracker, corresponding_frame = ([0 for _ in range(track_length)] for _ in range(19))
 
 
     for idx in range(track_length):
