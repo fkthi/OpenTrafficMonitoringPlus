@@ -922,7 +922,6 @@ def process_finished_track(track):
         else:
             break
     idx_to_drop = list(set(first_range + second_range))
-    print(idx_to_drop)
 
     avg_speed = sum(speed) / len(speed)
     if avg_speed <= cfg.standstill:
