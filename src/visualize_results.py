@@ -55,7 +55,7 @@ def compress_video(video_path, abs_path, video_name):
     os.remove(video_path)
 
 def visualize_tracks(path, all_tracks, cfg):
-    from postprocess import back_to_normal
+    from postprocess import back_to_pixel
     n_frames_smoothing = 20
     assert n_frames_smoothing % 2 ==0 ,"smoothing factor must be even"
     assert cfg.vis_mode in ["normal", "debug"], "Invalid Argument for Visualization mode"
@@ -101,7 +101,7 @@ def visualize_tracks(path, all_tracks, cfg):
 
             if cfg.draw_kf_corners:
                 corresponding_bb_kf = trk["carCornersKF_tracker"][idx_pos_of_bb]
-                corresponding_bb_kf = back_to_normal(np.array(corresponding_bb_kf), cfg.meter_to_px,
+                corresponding_bb_kf = back_to_pixel(np.array(corresponding_bb_kf), cfg.meter_to_px,
                                                      cfg.orientation_offset, cfg.linear_offsets)
                 corresponding_bb_kf = np.int0(corresponding_bb_kf)
                 cv2.drawContours(frame, [corresponding_bb_kf], 0, (0, 0, 0), 2)

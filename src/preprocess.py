@@ -118,6 +118,13 @@ def preprocess_images(image_folder, temp_folder, cfg):
 
         cfg.height = ref_img.shape[0]
         cfg.width = ref_img.shape[1]
+def _convert_image_name(img_name, total_frames):
+    l1 = len(str(img_name))
+    l2 = len(str(total_frames))
+    if l1 < l2:
+        # Add leading zeros if necessary
+        img_name = ("0" * (l2 - l1)) + str(img_name)
+    return str(img_name)
 
 def preprocess(video_path, temp_dir, cfg):
     """
@@ -175,7 +182,7 @@ def preprocess(video_path, temp_dir, cfg):
             if success and i < cfg.num_frames:
                 if not (image.shape[0] == cfg.height and image.shape[1] == cfg.width):
                     image = cv2.resize(image, (cfg.width, cfg.height))
-                cv2.imwrite(extraction_folder + str(i) + ".jpg", image, [cv2.IMWRITE_JPEG_QUALITY, cfg.jpg_quality])
+                cv2.imwrite(extraction_folder + _convert_image_name(i +1, total_frame) + ".jpg", image, [cv2.IMWRITE_JPEG_QUALITY, cfg.jpg_quality])
                 success, image = cap.read()
 
     if cfg.register_images:
