@@ -889,7 +889,7 @@ def process_finished_track(track):
         yaw_in_img[idx] = (his_x[6] - cfg.orientation_offset)
         acc_x_ltp[idx] = (his_x[4])
         acc_y_ltp[idx] = (his_x[5])
-        acc_magn[idx] = ((his_x[4] ** 2 + his_x[5] ** 2) * (1 / 2))
+        acc_magn[idx] = (math.sqrt(his_x[4] ** 2 + his_x[5] ** 2))
         course_og[idx] = (his_e[2])
         veh_length[idx] = (kf_obj.history_car_length[idx])
         veh_width[idx] = (kf_obj.history_car_width[idx])
