@@ -906,12 +906,28 @@ def process_finished_track(track):
     idx_to_drop = []
     for idx in range(track_length):
         if not veh_length[idx] > avg_veh_length:
-            idx_to_drop.append(idx) 
+            idx_to_drop.append(idx)
+    # Make Sure to drop only at the beginning and in the end
+    first_range = []
+    for i in range(len(idx_to_drop) -1):
+        if idx_to_drop[i + 1] == idx_to_drop[i] +1:
+            first_range.append(idx_to_drop[i])
+        else:
+            break
 
-        avg_speed = sum(speed) / len(speed)
-        if avg_speed <= cfg.standstill:
-            # Discard track if the average speed is below the standstill threshold
-            return
+    second_range = []
+    for i in range(len(idx_to_drop) -1)[::-1]:
+        if idx_to_drop[i + -1] == idx_to_drop[i] + -1:
+            second_range.append(idx_to_drop[i])
+        else:
+            break
+    idx_to_drop = list(set(first_range + second_range))
+    print(idx_to_drop)
+
+    avg_speed = sum(speed) / len(speed)
+    if avg_speed <= cfg.standstill:
+        # Discard track if the average speed is below the standstill threshold
+        return
     # Dropping indices  
     final_tracks[final_trk_id] = {
         "posX": [el for i, el in enumerate(pos_x) if i not in idx_to_drop],
