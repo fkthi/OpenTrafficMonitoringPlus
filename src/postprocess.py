@@ -307,11 +307,10 @@ def length_class(car_corners, resolution, meter_to_px, orientation_offset, linea
     return veh_length, veh_width, measurement_vec, car_corners
 
 
-def back_to_normal(car_corners_kf, meter_to_px, orientation_offset,
-                   linear_offsets):
+def back_to_pixel(car_corners_kf, meter_to_px, orientation_offset,
+                  linear_offsets):
     """
-    Inverts the transformation from car_corners in px to car_corners_kf
-    in meter
+    Transforms the car corners in Meter back to pixels
     """
     car_corners_picture = np.zeros((4, 2))
     # Translating the corners of the bounding box
@@ -580,9 +579,9 @@ class KF():
                                                    self.car_width,
                                                    self.car_corners)
 
-        transformed_corners = back_to_normal(car_corners_kf, cfg.meter_to_px,
-                                             cfg.orientation_offset,
-                                             cfg.linear_offsets)
+        transformed_corners = back_to_pixel(car_corners_kf, cfg.meter_to_px,
+                                            cfg.orientation_offset,
+                                            cfg.linear_offsets)
         self.X = x_new
         self.x_new = x_new
         self.car_corners_kf = car_corners_kf
@@ -871,7 +870,7 @@ def process_finished_track(track):
     kf_obj = track[TrackEnum.KALMANFILTER]
     track_length = len(kf_obj.history_E)
 
-    pos_x, pos_y, vel_x_gtp, vel_y_gtp, speed, vel_x_ltp, vel_y_ltp, acc_magn, course_og, \
+    pos_x, pos_y, vel_x_ltp, vel_y_ltp, speed, acc_x_ltp, acc_y_ltp, acc_magn, course_og, \
     yaw, yaw_in_img, veh_length, veh_width, car_cornerskf_tracker, \
     car_corners_tracker, corresponding_frame = ([0 for _ in range(track_length)] for _ in range(16))
 
@@ -883,14 +882,14 @@ def process_finished_track(track):
 
         pos_x[idx] = (his_x[0])
         pos_y[idx] = (his_x[1])
-        vel_x_gtp[idx] = (his_x[2])
-        vel_y_gtp[idx] = (his_x[3])
+        vel_x_ltp[idx] = (his_x[2])
+        vel_y_ltp[idx] = (his_x[3])
         speed[idx] = (math.sqrt(his_x[2] ** 2 + his_x[3] ** 2))
         yaw[idx] = (his_x[6])
         yaw_in_img[idx] = (his_x[6] - cfg.orientation_offset)
-        vel_x_ltp[idx] = (his_e[4])
-        vel_y_ltp[idx] = (his_e[5])
-        acc_magn[idx] = ((his_e[4] ** 2 + (his_e[5]) ** 2) ** (1 / 2))
+        acc_x_ltp[idx] = (his_e[4])
+        acc_y_ltp[idx] = (his_e[5])
+        acc_magn[idx] = ((his_e[4] * 2 + his_e[5] * 2) * (1 / 2))
         course_og[idx] = (his_e[2])
         veh_length[idx] = (kf_obj.history_car_length[idx])
         veh_width[idx] = (kf_obj.history_car_width[idx])
@@ -919,6 +918,8 @@ def process_finished_track(track):
         "posX": [el for i, el in enumerate(pos_x) if i not in idx_to_drop],
         "posY": [el for i, el in enumerate(pos_y) if i not in idx_to_drop],
         "speed": [el for i, el in enumerate(speed) if i not in idx_to_drop],
+        "acc_x": [el for i, el in enumerate(acc_x_ltp) if i not in idx_to_drop],
+        "acc_y": [el for i, el in enumerate(acc_y_ltp) if i not in idx_to_drop],
         "acc" : [el for i, el in enumerate(acc_magn) if i not in idx_to_drop],
         "veh_length": [el for i, el in enumerate(veh_length) if i not in idx_to_drop],
         "veh_width": [el for i, el in enumerate(veh_width) if i not in idx_to_drop],
