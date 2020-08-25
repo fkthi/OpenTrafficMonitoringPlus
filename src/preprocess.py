@@ -118,6 +118,7 @@ def preprocess_images(image_folder, temp_folder, cfg):
 
         cfg.height = ref_img.shape[0]
         cfg.width = ref_img.shape[1]
+
 def _convert_image_name(img_name, total_frames):
     l1 = len(str(img_name))
     l2 = len(str(total_frames))
@@ -167,12 +168,12 @@ def preprocess(video_path, temp_dir, cfg):
     if not os.path.exists(temp_folder_raw):
         os.mkdir(temp_folder_raw)
 
-    if len(os.listdir(temp_folder_reg)) == min(cfg.num_frames, total_frame):
+    if len(os.listdir(temp_folder_reg)) == min(cfg.num_frames, total_frame -1):
         print("found existing preprocessed images in {} -> skipping preprocessing".format(temp_folder_reg))
         return
 
     # Check if frames have already been extracted
-    if len(os.listdir(temp_folder_raw)) == min(cfg.num_frames, total_frame):
+    if len(os.listdir(temp_folder_raw)) == min(cfg.num_frames, total_frame -1):
         print("found extracted images in {} -> skipping extraction".format(temp_folder_raw))
 
     else:
