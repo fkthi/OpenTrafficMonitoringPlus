@@ -126,7 +126,7 @@ example:
 new_config_a = default_config.copy({
     "config_name": "config for 50m footage",
     "video_name": "50m",
-    "meter_to_pixel": 0.07,
+    "meter_to_pixel": 0.035,
     "drone_height":50,
     # ....
 })
