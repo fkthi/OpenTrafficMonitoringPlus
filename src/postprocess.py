@@ -510,7 +510,7 @@ class KF():
         self._car_length = 0
         self._car_width = 0
         self.x_old = np.zeros((8,))
-        self.system_covariance_matrix = np.eye(len(self.x_old)) * 0.00001
+        self.system_covariance_matrix = np.eye(len(self.x_old))
         self.system_covariance_matrix[6, 6] = self.system_covariance_matrix[6, 6] * 0.0001
         self._X = np.zeros((8, 1))
         self._E = np.zeros((6, 1))
