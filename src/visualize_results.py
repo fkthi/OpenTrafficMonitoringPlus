@@ -38,8 +38,10 @@ def unit_mapping(val, meter_to_px):
         "veh_width": "m",
         "posX": "m",
         "posY": "m",
-        "accx_LTP": "m/s",
-        "accY_LTP": "m/s"
+        "accX_LTP": "m/s",
+        "accY_LTP": "m/s",
+        "accX_LCP": "m/s",
+        "accY_LCP": "m/s"
     }
     retval = switch.get(val, "")
 
@@ -62,7 +64,7 @@ def visualize_tracks(path, all_tracks, cfg):
 
     supported_metrics = [
         "speed", "yaw", "yawInImg", "posX", "posY", "veh_length", "veh_width",
-        "accX_LTP", "accY_LTP"
+        "accX_LTP", "accY_LTP", "accX_LCP", "accY_LCP"
     ]
 
     if not cfg.vis_metric in supported_metrics:
