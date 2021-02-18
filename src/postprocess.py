@@ -923,10 +923,11 @@ def process_finished_track(track):
             break
     idx_to_drop = list(set(first_range + second_range))
 
-    avg_speed = sum(speed) / len(speed)
-    if avg_speed <= cfg.standstill:
-        # Discard track if the average speed is below the standstill threshold
-        return
+    if cfg.discard_slow_tracks:
+        avg_speed = sum(speed) / len(speed)
+        if avg_speed <= cfg.standstill:
+            # Discard track if the average speed is below the standstill threshold
+            return
     # Dropping indices  
     final_tracks[final_trk_id] = {
         "posX": [el for i, el in enumerate(pos_x) if i not in idx_to_drop],
