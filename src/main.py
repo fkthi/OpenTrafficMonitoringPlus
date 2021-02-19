@@ -37,10 +37,8 @@ def parse_args():
     args = parser.parse_args()
 
 
-def process_images(image_folder, output_folder, config_name):
-
-    cfg = config_by_config_name(config_name)
-    temp_path = output_folder + "temp/"
+def process_images(image_folder, output_folder, cfg):
+    temp_path = os.path.join(output_folder, "temp") + "/"
     os.makedirs(temp_path, exist_ok=True)
 
     preprocess_images(image_folder, temp_path, cfg)
@@ -84,7 +82,26 @@ if __name__ == "__main__":
         process_videos(*args.videos.split(":"))
 
     if args.images:
-        if not args.config:
-            raise ValueError(
-                "'--config' is required when evaluating on images")
-        process_images(*args.images.split(":"), config_name=args.config)
+        subfolders = [f.path + "/" for f in os.scandir(args.images.split(":")[0]) if f.is_dir()]
+        if len(subfolders) == 0:
+            # Single dir with images
+            if not args.config:
+                raise ValueError(
+                    "'--config' is required when evaluating on images")
+            cfg = config_by_config_name(args.config)
+            print("Process single image folder : {}".format(args.images.split(":")[0]))
+            process_images(*args.images.split(":"), cfg)
+
+        else:
+            # Multiple dirs
+            base_output_folder = args.images.split(":")[1]
+            print("Process a total amount of {} folders : {}".format(len(subfolders), subfolders))
+            for subfolder in subfolders:
+                if not args.config:
+                    video_name = os.path.basename(os.path.normpath(subfolder))
+                    cfg = config_by_video_name(video_name)
+                else:
+                    cfg = config_by_config_name(args.config)
+                output_folder = os.path.join(base_output_folder,os.path.normpath(subfolder)) + "/"
+                process_images(subfolder, output_folder, cfg)
+
