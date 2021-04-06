@@ -9,20 +9,29 @@ import time
 import shutil
 
 
-def _register_image(img_to_align_name, ref_image, raw_img_folder, temp_folder, hessian_threshold, jpg_quality):
+def _register_image(img_to_align_name, ref_image, raw_img_folder, temp_folder, hessian_threshold, jpg_quality, kp_algo):
     image_idx = img_to_align_name
     img_to_align_name = cv2.imread(raw_img_folder + img_to_align_name)
     align = cv2.cvtColor(img_to_align_name, cv2.COLOR_BGR2GRAY)
     ref = cv2.cvtColor(ref_image, cv2.COLOR_BGR2GRAY)
     height, width = ref.shape
-    surf = cv2.xfeatures2d.SURF_create(hessian_threshold)
+
+    if kp_algo.lower() == "surf":
+        kp = cv2.xfeatures2d.SURF_create(hessian_threshold)
+        norm = cv2.NORM_L1
+        x_check = False
+    else:
+        kp = cv2.ORB_create()
+        norm = cv2.NORM_HAMMING
+        x_check = True
 
     if "ref_kp" not in _register_image.__dict__:
-        _register_image.ref_kp, _register_image.ref_d = surf.detectAndCompute(ref, None)
+        _register_image.ref_kp, _register_image.ref_d = kp.detectAndCompute(ref, None)
 
-    kp1, d1 = surf.detectAndCompute(align, None)
 
-    matcher = cv2.BFMatcher(cv2.NORM_L1, crossCheck=False)
+    kp1, d1 = kp.detectAndCompute(align, None)
+    matcher = cv2.BFMatcher(norm, crossCheck=x_check)
+
     matches = matcher.match(d1, _register_image.ref_d)
     matches.sort(key=lambda x: x.distance)
     matches = matches[:int(len(matches) * 90)]
@@ -44,11 +53,12 @@ def _register_image(img_to_align_name, ref_image, raw_img_folder, temp_folder, h
 
 
 def register_images(temp_dir, temp_folder_raw, temp_folder_reg, ref_img, cfg):
+    assert cfg.kp_algo.lower() in ["surf", "orb"], "Keypoint algorithm '{}' not supported" .format(cfg.kp_algo)
     p_bar = tqdm(total=len(os.listdir(temp_folder_raw)), disable=not cfg.verbose, desc="Register frames".center(30))
     p = Pool(cfg.num_workers).map_async(functools.partial(_register_image, ref_image=ref_img,
                                                           raw_img_folder=temp_folder_raw, temp_folder=temp_dir,
                                                           hessian_threshold=cfg.hessian_threshold,
-                                                          jpg_quality=cfg.jpg_quality),
+                                                          jpg_quality=cfg.jpg_quality, kp_algo=cfg.kp_algo),
                                         os.listdir(temp_folder_raw))
     while True:
         a = len(os.listdir(temp_folder_raw))

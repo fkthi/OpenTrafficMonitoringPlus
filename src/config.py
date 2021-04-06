@@ -46,6 +46,8 @@ default_config = Config({
     "num_workers": 4,
     # Whether to register the images (fixed frame for all images - important for tracking!)
     "register_images": False,
+    # Keypoint Detection algorithm used for registration. Either "surf" or "orb"
+    "kp_algo": "surf",
     # hessian_threshold value for keypoint computation.
     # Lower Value -> better results and vice versa.
     # We achieved good results with values from 2000 to 5000
