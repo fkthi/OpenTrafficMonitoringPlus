@@ -13,8 +13,8 @@ This is the Detectron2 based implementation supplemented with the following publ
 * This implementation yields Linux
 * It is faster and requires less GPU RAM
 * For the original implementation see [OpenTrafficMonitoring](https://github.com/fkthi/OpenTrafficMonitoring).
-* Execution time comparison between original OTM and OTM+ for 3 different videos. OTM+ is faster at all sub-processes. With more objects in an image, the speed gain increases: 
-![performance_comp](src/assets/performance_comparison.png)	
+* Execution time in milliseconds (varies with the number of objects): 
+![performance_comp](src/assets/runtime.png)	
 
 
 # The repository includes:
@@ -50,9 +50,9 @@ The blue rectangle and cross indicate the image frame and center. For estimation
 
 
 # Which accuracy can be expected?
-The figure below depicts the error curves we obtained from the experiments in the publications.
+The figure below depicts the error curves we obtained from the experiments.
 
-![Paper Image2](src/assets/figure_results_both_publications.png)	
+![Paper Image2](src/assets/results.png)	
 
 Here is a detailed Table with position error results from publication (1), where the detection is performed frame-by-frame, i.e. no smoothing/filtering is applied: \
 ![Paper Image](src/assets/table_results.png)
@@ -126,7 +126,7 @@ example:
 new_config_a = default_config.copy({
     "config_name": "config for 50m footage",
     "video_name": "50m",
-    "meter_to_pixel": 0.035,
+    "meter_to_pixel": 0.07,
     "drone_height":50,
     # ....
 })
