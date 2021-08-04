@@ -65,7 +65,7 @@ default_config = Config({
     # reducing this value is a good idea.
     "detections_per_image": 150,
     # Weights used for inference
-    "weights_path": "maskrcnn/model_final.pth",
+    "weights_path": "maskrcnn/model_final_FHD_50kIt_bs2_noAug_790img.pth",
     # Detectron2 config used for inference. (Has nothing to do with this config)
     "detectron2_config": "./maskrcnn/mask_rcnn_R_50_FPN_1x.yaml",
     # Number of classes in the model
