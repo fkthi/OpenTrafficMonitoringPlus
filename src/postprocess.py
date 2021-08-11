@@ -410,14 +410,9 @@ def kalman_filter(fps, resolution, drone_height, measurement_vec, x_old, system_
         measurement_noise = np.diag([0.0838, 0.0838, 0.0843])
         system_noise = np.diag([.104, .104, .1, .1, 3, 3, 1, 1])
     else:
-        if resolution[0] not in [1920, 3840]:
-            measurement_noise = np.diag([0.0838, 0.0838, 0.0843])
-            system_noise = np.diag([.104, .104, .1, .1, 3, 3, 1, 1])
-            print("WARNING: KF tuning parameters not defined for this resolution."
-                  " Setting to default 1920x1080 values.")
-        else:
-            print("WARNING: DroneHeight not supported."
-                  " defaulting to maximum height of 100 meter")
+        measurement_noise = np.diag([0.0838, 0.0838, 0.0843])
+        system_noise = np.diag([.104, .104, .1, .1, 3, 3, 1, 1])
+
     d_t = 1 / fps
     system_model = np.array([[1, 0, d_t, 0, (d_t ** 2) / 2, 0, 0, 0],
                              [0, 1, 0, d_t, 0, (d_t ** 2) / 2, 0, 0],
@@ -1071,6 +1066,13 @@ def postprocess(temp_dir, config):
     if cfg.meter_to_px == 1:
         print("WARNING: the 'meter_to_pixel' value is set to 1,"
               " so the results are based on pixel and not meters")
+    if cfg.width not in [1920, 3840]:
+        print("WARNING: KF tuning parameters not defined for this resolution."
+            " Setting to default 1920x1080 values.")
+    if cfg.drone_height > 100:
+        print("WARNING: DroneHeight not supported."
+        " defaulting to maximum height of 100 meter")
+
 
     results_dir = "./" + str(Path(temp_dir).parents[0]) + "/results/"
 
