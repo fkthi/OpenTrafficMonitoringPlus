@@ -87,9 +87,9 @@ Note that a config must be specified when using images, since the config cannot 
 One example video is already included in this repository ([DJI_0029_example.mp4](src/videos/)).
 For further data, i.e. pre-trained weights, the labeled data of the test vehicle or one complete video from the paper data set,
 download the data hosted on the [FAU University](https://www.fau.eu/) server or the mirrors on Google Drive: 
-* [Example video frames from publication (1) ~ 6GB](https://faubox.rrze.uni-erlangen.de/getlink/fiU4TAFUx95npBKD9YQxYbai/IEEE_IV_2020_images_example.zip) 
-* [Labeled training data set from test track](https://faubox.rrze.uni-erlangen.de/getlink/fi2x2oaNQfM55UgBP2YBB6Vp/IEEE_IV_2020_LabelData_only_A4.zip) | [mirror](https://drive.google.com/file/d/1zJH3q1Jjh91WCCz_wnArgNq2WZkTNeXB/view?usp=sharing)
-* [1920x1080 weights](https://faubox.rrze.uni-erlangen.de/getlink/fiSYQEEfhuVgBJjrDixGejUY/model_final_FHD_50kIt_bs2_noAug_790img.pth) or [1280x720 weights](https://faubox.rrze.uni-erlangen.de/getlink/fiBXvL2Rbixu6kwvaz1cMY7q/model_final_HDR_30kIt_bs2_Aug_790img.pth) | [mirror 1080](https://drive.google.com/file/d/19hMb17Uj5JlITUaGo7JEzdmrfV1ugxel/view?usp=sharing) | [mirror 720](https://drive.google.com/file/d/1zCmQz6bkHwNRiJFgymPylP6p558WFtUP/view?usp=sharing)
+* [Example video frames from publication (1) ~ 6GB](https://faubox.rrze.uni-erlangen.de/getlink/fiB86gSKemZA6vkbKfzKdr/IEEE_IV_2020_images_example.zip) 
+* [Labeled training data set from test track](https://faubox.rrze.uni-erlangen.de/getlink/fiGVVY8czu2Q4bj7w7ciRg/IEEE_IV_2020_LabelData_only_A4.zip) | [mirror](https://drive.google.com/file/d/1zJH3q1Jjh91WCCz_wnArgNq2WZkTNeXB/view?usp=sharing)
+* [1920x1080 weights](https://faubox.rrze.uni-erlangen.de/getlink/fi3nEfe6oLCeH4ULPjDE8j/model_final_FHD_50kIt_bs2_noAug_790img.pth) or [1280x720 weights](https://faubox.rrze.uni-erlangen.de/getlink/fiJJkPcvtJZ2JK7DUMFb6z/model_final_HDR_30kIt_bs2_Aug_790img.pth) | [mirror 1080](https://drive.google.com/file/d/19hMb17Uj5JlITUaGo7JEzdmrfV1ugxel/view?usp=sharing) | [mirror 720](https://drive.google.com/file/d/1zCmQz6bkHwNRiJFgymPylP6p558WFtUP/view?usp=sharing)
 * Full-HD resolution yields better results
 # Apply your own training 
 If you want to increase the detection performance, create a labeled training data set and apply transfer learning. \
